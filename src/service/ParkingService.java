@@ -40,4 +40,24 @@ public class ParkingService {
     public List<ParkingSpot> getParkingLotStatus() {
         return spotDAO.getAllSpots();
     }
+
+    public boolean parkVehicleAt(Vehicle vehicle, String spotId) {
+        // 1. Double check if the spot is actually available (prevent race conditions)
+        model.ParkingSpot spot = spotDAO.getAllSpots().stream()
+                .filter(s -> s.getSpotId().equals(spotId))
+                .findFirst()
+                .orElse(null);
+
+        if (spot == null || spot.isOccupied()) {
+            System.out.println("Parking Failed: Spot is occupied or invalid.");
+            return false;
+        }
+
+        // 2. Save the vehicle
+        vehicleDAO.saveVehicle(vehicle, spotId);
+        
+        // 3. Update the spot status
+        spotDAO.markOccupied(spotId);
+        return true;
+    }
 }

@@ -15,7 +15,7 @@ public class AdminPanel extends JPanel {
         setLayout(new BorderLayout());
 
         // 1. Header
-        JLabel header = new JLabel("Parking Lot Status (Live View)", SwingConstants.CENTER);
+        JLabel header = new JLabel("Parking Lot Status", SwingConstants.CENTER);
         header.setFont(new Font("Arial", Font.BOLD, 18));
         add(header, BorderLayout.NORTH);
 

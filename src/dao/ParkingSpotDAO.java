@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import model.ParkingSpot;
@@ -76,12 +77,13 @@ public class ParkingSpotDAO {
     }
 
     public void initializeParkingLot() {
+        createVipTable();
         if (getSpotCount() > 0) {
-            System.out.println("✅ Parking Lot already initialized.");
+            System.out.println("Parking Lot already initialized.");
             return;
         }
 
-        System.out.println("⚠️ Database empty. Initializing custom spot layout...");
+        System.out.println("Database empty. Initializing custom spot layout...");
 
         String sql = "INSERT INTO parking_spot (spot_id, type, status, hourly_rate) VALUES (?, ?, ?, ?)";
         
@@ -95,9 +97,13 @@ public class ParkingSpotDAO {
                 
                 // 18 SPOTS per Floor
                 for (int s = 1; s <= 18; s++) {
+
+                    int row = 1;
+                    if (s > 6) row = 2;
+                    if (s > 12) row = 3;
                     
-                    // ID Format: F1-S1, F1-S2 ... F1-S18
-                    String spotId = "F" + floor + "-S" + s;
+                    // ID Format: F1-R1-S1
+                    String spotId = "F" + floor + "-R" + row + "-S" + s;
                     
                     SpotType type = SpotType.REGULAR; // Default (RM 5.0)
                     
@@ -127,7 +133,7 @@ public class ParkingSpotDAO {
             conn.commit();
             conn.setAutoCommit(true);
             
-            System.out.println("🎉 SUCCESS: Created spots 1-18 with your specific types.");
+            System.out.println("SUCCESS: Created spots 1-18 with your specific types.");
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -147,5 +153,50 @@ public class ParkingSpotDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    // Create the VIP table if it doesn't exist
+    public void createVipTable() {
+        String sql = "CREATE TABLE IF NOT EXISTS vip_whitelist (" +
+                     "plate_number TEXT PRIMARY KEY, " +
+                     "owner_name TEXT)";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to REGISTER a new VIP
+    public boolean registerVip(String plate, String name) {
+        String sql = "INSERT INTO vip_whitelist(plate_number, owner_name) VALUES(?, ?)";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, plate);
+            pstmt.setString(2, name);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Error: Plate might already be registered.");
+            return false;
+        }
+    }
+
+    // Method to CHECK if a plate is VIP
+    public boolean isVip(String plate) {
+        String sql = "SELECT * FROM vip_whitelist WHERE plate_number = ?";
+        
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, plate);
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next(); // Returns true if found
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

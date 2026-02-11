@@ -26,7 +26,7 @@ public class DatabaseConnection {
             connection.setAutoCommit(true);
             
             // 3. Print the path so you can debug!
-            System.out.println("✅ Database connected at: " + dbPath);
+            System.out.println("Database connected at: " + dbPath);
             
             createTables();
             
