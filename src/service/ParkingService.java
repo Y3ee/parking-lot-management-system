@@ -29,6 +29,11 @@ public class ParkingService {
     // Option 1: change return type to Ticket (recommended)
     public model.Ticket parkVehicle(Vehicle vehicle) {
 
+        if (vehicleDAO.isCurrentlyParked(vehicle.getPlateNumber())) {
+            System.out.println("Parking Failed: Vehicle already parked.");
+            return null;
+        }
+
         ParkingSpot spot = spotDAO.getAllSpots().stream()
                 .filter(s -> !s.isOccupied())
                 .filter(s -> vehicle.canParkIn(s.getType()))
@@ -46,6 +51,7 @@ public class ParkingService {
         return generateTicket(vehicle, spot.getSpotId());
     }
 
+
     // AdminPanel uses this
     public List<ParkingSpot> getParkingLotStatus() {
         return spotDAO.getAllSpots();
@@ -53,6 +59,11 @@ public class ParkingService {
 
     // Your EntryPanel uses this (user selects spot)
     public model.Ticket parkVehicleAt(Vehicle vehicle, String spotId) {
+
+        if (vehicleDAO.isCurrentlyParked(vehicle.getPlateNumber())) {
+            System.out.println("Parking Failed: Vehicle already parked.");
+            return null;
+        }
 
         ParkingSpot spot = spotDAO.getAllSpots().stream()
                 .filter(s -> s.getSpotId().equals(spotId))
@@ -68,6 +79,7 @@ public class ParkingService {
 
         return generateTicket(vehicle, spotId);
     }
+
 
     private model.Ticket generateTicket(Vehicle v, String spotId) {
         java.time.format.DateTimeFormatter fmt =
