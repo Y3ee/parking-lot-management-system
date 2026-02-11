@@ -4,7 +4,7 @@ import dao.ParkingSpotDAO;
 import dao.VehicleDAO;
 import java.util.List;
 import model.ParkingSpot;
-import model.Vehicle; // This was likely missing!
+import model.Vehicle;
 
 public class ParkingService {
 
@@ -25,39 +25,54 @@ public class ParkingService {
         return instance;
     }
 
-    public boolean parkVehicle(Vehicle vehicle) {
-        ParkingSpot spot = spotDAO.findAvailableSpot(vehicle.getType());
+    // ✅ FIX: remove getType() usage. Use polymorphism vehicle.canParkIn(spot.getType())
+    // Option 1: change return type to Ticket (recommended)
+    public model.Ticket parkVehicle(Vehicle vehicle) {
+
+        ParkingSpot spot = spotDAO.getAllSpots().stream()
+                .filter(s -> !s.isOccupied())
+                .filter(s -> vehicle.canParkIn(s.getType()))
+                .findFirst()
+                .orElse(null);
+
         if (spot == null) {
-            System.out.println("Parking Failed: No spots available.");
-            return false;
+            System.out.println("Parking Failed: No suitable spots available.");
+            return null;
         }
+
         vehicleDAO.saveVehicle(vehicle, spot.getSpotId());
         spotDAO.markOccupied(spot.getSpotId());
-        return true;
+
+        return generateTicket(vehicle, spot.getSpotId());
     }
 
-    // THIS is the method AdminPanel was looking for
+    // AdminPanel uses this
     public List<ParkingSpot> getParkingLotStatus() {
         return spotDAO.getAllSpots();
     }
 
-    public boolean parkVehicleAt(Vehicle vehicle, String spotId) {
-        // 1. Double check if the spot is actually available (prevent race conditions)
-        model.ParkingSpot spot = spotDAO.getAllSpots().stream()
+    // Your EntryPanel uses this (user selects spot)
+    public model.Ticket parkVehicleAt(Vehicle vehicle, String spotId) {
+
+        ParkingSpot spot = spotDAO.getAllSpots().stream()
                 .filter(s -> s.getSpotId().equals(spotId))
                 .findFirst()
                 .orElse(null);
 
-        if (spot == null || spot.isOccupied()) {
-            System.out.println("Parking Failed: Spot is occupied or invalid.");
-            return false;
-        }
+        if (spot == null || spot.isOccupied()) return null;
 
-        // 2. Save the vehicle
+        if (!vehicle.canParkIn(spot.getType())) return null;
+
         vehicleDAO.saveVehicle(vehicle, spotId);
-        
-        // 3. Update the spot status
         spotDAO.markOccupied(spotId);
-        return true;
+
+        return generateTicket(vehicle, spotId);
+    }
+
+    private model.Ticket generateTicket(Vehicle v, String spotId) {
+        java.time.format.DateTimeFormatter fmt =
+                java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        String ticketId = "T-" + v.getPlateNumber() + "-" + v.getEntryTime().format(fmt);
+        return new model.Ticket(ticketId, spotId, v.getEntryTime());
     }
 }
