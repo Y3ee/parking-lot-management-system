@@ -2,6 +2,7 @@ import javax.swing.*; // Import this
 import service.ParkingService;
 import ui.AdminPanel;
 import ui.EntryPanel;
+import ui.ExitPanel;
 
 public class Main {
     public static void main(String[] args) {
@@ -16,6 +17,7 @@ public class Main {
             JTabbedPane tabs = new JTabbedPane();
             
             tabs.addTab("Entry / Park", new EntryPanel());
+            tabs.addTab("Exit / Payment", new ExitPanel());
             tabs.addTab("Admin / View Status", new AdminPanel());
 
             frame.add(tabs);

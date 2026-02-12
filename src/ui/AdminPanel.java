@@ -7,6 +7,10 @@ import javax.swing.border.TitledBorder;
 import model.ParkingSpot;
 import service.ParkingService;
 
+import model.FixedFineScheme;
+import model.HourlyFineScheme;
+import model.ProgressiveFineScheme;
+
 public class AdminPanel extends JPanel {
 
     private JPanel mainListPanel; // Changed from 'gridPanel' to 'mainListPanel'
@@ -18,6 +22,41 @@ public class AdminPanel extends JPanel {
         JLabel header = new JLabel("Parking Lot Status", SwingConstants.CENTER);
         header.setFont(new Font("Arial", Font.BOLD, 18));
         add(header, BorderLayout.NORTH);
+
+        // ===== Fine Scheme Selector (Admin Only) =====
+        JPanel schemePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        schemePanel.add(new JLabel("Fine Scheme:"));
+
+        String[] schemes = {"Fixed", "Progressive", "Hourly"};
+        JComboBox<String> schemeCombo = new JComboBox<>(schemes);
+        schemePanel.add(schemeCombo);
+
+        JButton applyBtn = new JButton("Apply Scheme");
+        applyBtn.setBackground(new Color(173, 216, 230)); 
+        schemePanel.add(applyBtn);
+
+        applyBtn.addActionListener(e -> {
+            String selected = (String) schemeCombo.getSelectedItem();
+
+            if ("Fixed".equals(selected)) {
+                ParkingService.getInstance().getFineService().setScheme(new FixedFineScheme());
+            }
+            else if ("Progressive".equals(selected)) {
+                ParkingService.getInstance().getFineService().setScheme(new ProgressiveFineScheme());
+            }
+            else if ("Hourly".equals(selected)) {
+                ParkingService.getInstance().getFineService().setScheme(new HourlyFineScheme());
+            }
+
+            JOptionPane.showMessageDialog(this,
+                    "Fine scheme set to: " + selected,
+                    "Updated",
+                    JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        add(schemePanel, BorderLayout.BEFORE_FIRST_LINE);
+
 
         // 2. The Main Container (Holds the 5 Floor Panels vertically)
         mainListPanel = new JPanel();

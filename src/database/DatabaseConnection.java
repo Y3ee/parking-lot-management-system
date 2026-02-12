@@ -79,7 +79,30 @@ public class DatabaseConnection {
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     plate_number TEXT,
                     amount REAL,
-                    paid INTEGER
+                    status TEXT
+                )
+            """);
+
+            //payment table (stores receipt + payment info)
+            stmt.execute("""
+                CREATE TABLE IF NOT EXISTS payment (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    plate_number TEXT,
+                    payment_time TEXT,
+                    payment_method TEXT,
+
+                    entry_time TEXT,
+                    exit_time TEXT,
+                    duration_hours INTEGER,
+
+                    hourly_rate REAL,
+                    parking_fee REAL,
+
+                    unpaid_fines REAL,
+                    new_fines REAL,
+
+                    total_paid REAL,
+                    remaining_balance REAL
                 )
             """);
 

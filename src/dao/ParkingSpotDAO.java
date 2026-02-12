@@ -175,7 +175,7 @@ public class ParkingSpotDAO {
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, plate);
+            pstmt.setString(1, plate.toUpperCase());
             pstmt.setString(2, name);
             pstmt.executeUpdate();
             return true;
@@ -191,7 +191,7 @@ public class ParkingSpotDAO {
         
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, plate);
+            pstmt.setString(1, plate.toUpperCase());
             ResultSet rs = pstmt.executeQuery();
             return rs.next(); // Returns true if found
         } catch (SQLException e) {
@@ -199,4 +199,18 @@ public class ParkingSpotDAO {
             return false;
         }
     }
+
+    public void markAvailable(String spotId) {
+        String sql = "UPDATE parking_spot SET status = 'AVAILABLE' WHERE spot_id = ?";
+        try (java.sql.Connection conn = database.DatabaseConnection.getInstance().getConnection();
+            java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, spotId);
+            ps.executeUpdate();
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 }

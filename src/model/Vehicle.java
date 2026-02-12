@@ -2,25 +2,26 @@ package model;
 
 import java.time.LocalDateTime;
 
-// 1. Make it ABSTRACT so you can't just create a generic "Vehicle"
 public abstract class Vehicle {
     protected String plateNumber;
-    protected SpotType type; // Use the Enum!
+    protected String vehicleType;       // e.g. Car, Motorcycle, SUV_TRUCK, HANDICAPPED
     protected LocalDateTime entryTime;
+    protected LocalDateTime exitTime;   // null if parked
 
-    public Vehicle(String plateNumber, SpotType type) {
+    public Vehicle(String plateNumber, String vehicleType) {
         this.plateNumber = plateNumber;
-        this.type = type;
+        this.vehicleType = vehicleType;
         this.entryTime = LocalDateTime.now();
+        this.exitTime = null;
     }
 
-    // 2. Abstract method for Polymorphism (Optional but impresses interviewers)
-    // e.g., public abstract double calculateRate(); 
+    public abstract boolean canParkIn(SpotType spotType);
 
     public String getPlateNumber() { return plateNumber; }
-    public SpotType getType() { return type; }
+    public String getVehicleType() { return vehicleType; }
     public LocalDateTime getEntryTime() { return entryTime; }
-    
-    // Add a setter for entryTime for Database loading
-    public void setEntryTime(LocalDateTime time) { this.entryTime = time; }
+    public LocalDateTime getExitTime() { return exitTime; }
+
+    public void setEntryTime(LocalDateTime entryTime) { this.entryTime = entryTime; }
+    public void setExitTime(LocalDateTime exitTime) { this.exitTime = exitTime; }
 }
