@@ -6,11 +6,14 @@ import java.util.List;
 import model.ParkingSpot;
 import model.Vehicle;
 
+
 public class ParkingService {
 
     private static ParkingService instance;
     private VehicleDAO vehicleDAO;
     private ParkingSpotDAO spotDAO;
+    private double totalRevenue = 0.0;
+
 
     private ParkingService() {
         vehicleDAO = new VehicleDAO();
@@ -87,4 +90,21 @@ public class ParkingService {
         String ticketId = "T-" + v.getPlateNumber() + "-" + v.getEntryTime().format(fmt);
         return new model.Ticket(ticketId, spotId, v.getEntryTime());
     }
+
+    public ExitService getExitService() {
+    return ExitService.getInstance();
+}
+
+public FineService getFineService() {
+    return FineService.getInstance();
+}
+
+public void addRevenue(double amount) {
+    totalRevenue += amount;
+}
+
+public double getTotalRevenue() {
+    return totalRevenue;
+}
+
 }

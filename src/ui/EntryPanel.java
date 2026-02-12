@@ -149,7 +149,7 @@ public class EntryPanel extends JPanel {
     }
 
     private void handleSpotClick(ParkingSpot spot) {
-        String plate = plateField.getText().trim();
+        String plate = plateField.getText().trim().toUpperCase();
 
         // 1. Basic Validation
         if (plate.isEmpty()) {
