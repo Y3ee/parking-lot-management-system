@@ -2,5 +2,9 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
         "c:\\Users\\shenyee\\Desktop\\y2s2\\OOAD\\sqlite-jdbc-3.51.1.0.jar"
+    ],
+    "java.project.sourcePaths": [
+        "src",
+        "parking-lot-management-system-main/src"
     ]
 }
