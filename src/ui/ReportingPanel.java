@@ -9,6 +9,7 @@ import model.FineReport.OutstandingFine;
 import model.OccupancyReport.FloorOccupancy;
 import model.OccupancyReport.TypeOccupancy;
 import service.ReportService;
+import java.time.format.DateTimeFormatter;
 
 public class ReportingPanel extends JPanel{
     private final ReportService reportService;
@@ -283,6 +284,9 @@ public class ReportingPanel extends JPanel{
     }
     
     private void populateVehicleTable(JTable table, VehicleListReport report) {
+
+        DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm");
+
         String[] columns = {"Plate", "Type", "Spot ID", "Spot Type", "Entry Time", "Hours", "Current Fee (RM)"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         
@@ -292,7 +296,7 @@ public class ReportingPanel extends JPanel{
                 vehicle.getVehicleType(),
                 vehicle.getSpotId(),
                 vehicle.getSpotType(),
-                vehicle.getEntryTime().toString(),
+                vehicle.getEntryTime().format(DT_FMT),
                 vehicle.getHoursParked(),
                 String.format("%.2f", vehicle.getCurrentFee())
             });

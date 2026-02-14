@@ -3,6 +3,7 @@ import service.ParkingService;
 import ui.AdminPanel;
 import ui.EntryPanel;
 import ui.ExitPanel;
+import ui.ReportingPanel;
 
 public class Main {
     public static void main(String[] args) {
@@ -19,6 +20,7 @@ public class Main {
             tabs.addTab("Entry / Park", new EntryPanel());
             tabs.addTab("Exit / Payment", new ExitPanel());
             tabs.addTab("Admin / View Status", new AdminPanel());
+            tabs.addTab("Report", new ReportingPanel());
 
             frame.add(tabs);
             frame.setVisible(true);

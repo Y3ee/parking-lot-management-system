@@ -277,7 +277,8 @@ public class ReportDAO {
                 v.vehicle_type,
                 v.spot_id,
                 p.type,
-                v.entry_time
+                v.entry_time,
+                COALESCE(v.is_oku_cardholder, 0) as is_oku_cardholder
             FROM vehicle v
             JOIN parking_spot p ON v.spot_id = p.spot_id
             WHERE v.exit_time IS NULL
@@ -286,14 +287,17 @@ public class ReportDAO {
         
         try (PreparedStatement ps = getConnection().prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-            
+
             while (rs.next()) {
+                boolean oku = rs.getInt("is_oku_cardholder") == 1;
+
                 list.add(new ParkedVehicle(
-                    rs.getString("plate_number"),
-                    rs.getString("vehicle_type"),
-                    rs.getString("spot_id"),
-                    SpotType.valueOf(rs.getString("type")),
-                    LocalDateTime.parse(rs.getString("entry_time"))
+                        rs.getString("plate_number"),
+                        rs.getString("vehicle_type"),
+                        rs.getString("spot_id"),
+                        SpotType.valueOf(rs.getString("type")),
+                        LocalDateTime.parse(rs.getString("entry_time")),
+                        oku
                 ));
             }
         }

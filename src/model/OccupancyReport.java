@@ -15,7 +15,7 @@ public class OccupancyReport {
                            Map<SpotType, TypeOccupancy> typeOccupancy) {
         this.totalSpots = totalSpots;
         this.occupiedSpots = occupiedSpots;
-        this.overallOccupancyRate = totalSpots == 0 ? 
+        this.overallOccupancyRate = totalSpots > 0 ? 
             (double) occupiedSpots / totalSpots * 100 : 0.0;
         this.floorOccupancy = floorOccupancy;
         this.typeOccupancy = typeOccupancy;

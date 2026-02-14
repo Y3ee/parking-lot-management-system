@@ -12,18 +12,25 @@ import model.Vehicle;
 
 public class VehicleDAO {
 
-    public void saveVehicle(Vehicle v, String spotId) {
-        String sql = "INSERT INTO vehicle (plate_number, vehicle_type, entry_time, spot_id) VALUES (?, ?, ?, ?)";
+    public void saveVehicle(Vehicle v, String spotId, boolean isOkuCardholder) {
+
+        String sql = """
+            INSERT INTO vehicle
+            (plate_number, vehicle_type, entry_time, spot_id, is_oku_cardholder)
+            VALUES (?, ?, ?, ?, ?)
+        """;
 
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+            PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, v.getPlateNumber().toUpperCase());
             ps.setString(2, v.getVehicleType());
             ps.setString(3, v.getEntryTime().toString());
             ps.setString(4, spotId);
+            ps.setInt(5, isOkuCardholder ? 1 : 0);
 
             ps.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -47,7 +54,7 @@ public class VehicleDAO {
 }
     public ActiveParkingRecord findActiveParkingRecord(String plate) {
         String sql = """
-            SELECT v.plate_number, v.entry_time, v.spot_id, p.type
+            SELECT v.plate_number, v.vehicle_type, v.entry_time, v.spot_id, p.type, COALESCE(v.is_oku_cardholder, 0) as is_oku_cardholder
             FROM vehicle v
             JOIN parking_spot p ON p.spot_id = v.spot_id
             WHERE v.plate_number = ? AND v.exit_time IS NULL
@@ -63,11 +70,13 @@ public class VehicleDAO {
 
             if (rs.next()) {
                 String plateNo = rs.getString("plate_number");
+                String vehicleType = rs.getString("vehicle_type");
                 LocalDateTime entry = LocalDateTime.parse(rs.getString("entry_time"));
                 String spotId = rs.getString("spot_id");
                 SpotType spotType = SpotType.valueOf(rs.getString("type"));
+                boolean oku  = rs.getInt("is_oku_cardholder") == 1;
 
-                return new ActiveParkingRecord(plateNo, entry, spotId, spotType);
+                return new ActiveParkingRecord(plateNo, vehicleType, entry, spotId, spotType, oku);
             }
             return null;
 

@@ -70,7 +70,8 @@ public class DatabaseConnection {
                     entry_time TEXT,
                     exit_time TEXT,
                     spot_id TEXT,
-                    fee_collected REAL DEFAULT 0.0                -- To calculate Total Revenue later
+                    fee_collected REAL DEFAULT 0.0,                -- To calculate Total Revenue later
+                    is_oku_cardholder INTEGER DEFAULT 0
                 )
             """);
 
