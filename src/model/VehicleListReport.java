@@ -28,7 +28,7 @@ public class VehicleListReport {
 
         public ParkedVehicle(String plateNumber, String vehicleType,
                              String spotId, SpotType spotType,
-                             LocalDateTime entryTime) {
+                             LocalDateTime entryTime, boolean isOkuCardholder) {
             this.plateNumber = plateNumber;
             this.vehicleType = vehicleType;
             this.spotId = spotId;
@@ -37,7 +37,21 @@ public class VehicleListReport {
 
             long minutes = Duration.between(entryTime, LocalDateTime.now()).toMinutes();
             this.hoursParked = minutes > 0 ? (minutes + 59) / 60 : 0; // round up to next hour
-            this.currentFee = hoursParked * spotType.getRate();
+
+            boolean isHandicappedVehicle = "HANDICAPPED".equalsIgnoreCase(vehicleType);
+
+            double rate;
+            if (isHandicappedVehicle) {
+                if (spotType == SpotType.HANDICAPPED) {
+                    rate = isOkuCardholder ? 0.0 : 2.0;
+                } else {
+                    rate = isOkuCardholder ? 2.0 : spotType.getRate();
+                }
+            } else {
+                rate = spotType.getRate();
+            }
+            
+            this.currentFee = hoursParked * rate;
         }
 
         public String getPlateNumber() { return plateNumber; }

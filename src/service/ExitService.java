@@ -43,9 +43,35 @@ public class ExitService {
         long hours = ceilHours(rec.getEntryTime(), now);
 
         SpotType spotType = rec.getSpotType();
-        double hourlyRate = spotType.getRate();
-        double parkingFee = hours * hourlyRate;
+        boolean isHandicappedVehicle = "HANDICAPPED".equalsIgnoreCase(rec.getVehicleType());
+        boolean hasCard = rec.isOkuCardholder();
 
+        double hourlyRate;
+        double parkingFee;
+
+        if (isHandicappedVehicle) {
+            if (spotType == SpotType.HANDICAPPED) {
+                if (hasCard) {
+                    hourlyRate = 0.0;          // FREE
+                    parkingFee = 0.0;
+                } else {
+                    hourlyRate = 2.0;          // no card but handicapped vehicle in handicapped spot -> RM2/hr
+                    parkingFee = hours * hourlyRate;
+                }
+            } else {
+                if (hasCard) {
+                    hourlyRate = 2.0;          // card in other spot -> RM2/hr
+                    parkingFee = hours * hourlyRate;
+                } else {
+                    hourlyRate = spotType.getRate(); // no card in other spot -> normal rate
+                    parkingFee = hours * hourlyRate;
+                }
+            }
+        } else {
+            hourlyRate = spotType.getRate();
+            parkingFee = hours * hourlyRate;
+        }
+        
         double unpaid = fineService.getUnpaidFines(p);
 
         double newFine = 0.0;

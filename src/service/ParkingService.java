@@ -30,29 +30,29 @@ public class ParkingService {
 
     // ✅ FIX: remove getType() usage. Use polymorphism vehicle.canParkIn(spot.getType())
     // Option 1: change return type to Ticket (recommended)
-    public model.Ticket parkVehicle(Vehicle vehicle) {
+    // public model.Ticket parkVehicle(Vehicle vehicle) {
 
-        if (vehicleDAO.isCurrentlyParked(vehicle.getPlateNumber())) {
-            System.out.println("Parking Failed: Vehicle already parked.");
-            return null;
-        }
+    //     if (vehicleDAO.isCurrentlyParked(vehicle.getPlateNumber())) {
+    //         System.out.println("Parking Failed: Vehicle already parked.");
+    //         return null;
+    //     }
 
-        ParkingSpot spot = spotDAO.getAllSpots().stream()
-                .filter(s -> !s.isOccupied())
-                .filter(s -> vehicle.canParkIn(s.getType()))
-                .findFirst()
-                .orElse(null);
+    //     ParkingSpot spot = spotDAO.getAllSpots().stream()
+    //             .filter(s -> !s.isOccupied())
+    //             .filter(s -> vehicle.canParkIn(s.getType()))
+    //             .findFirst()
+    //             .orElse(null);
 
-        if (spot == null) {
-            System.out.println("Parking Failed: No suitable spots available.");
-            return null;
-        }
+    //     if (spot == null) {
+    //         System.out.println("Parking Failed: No suitable spots available.");
+    //         return null;
+    //     }
 
-        vehicleDAO.saveVehicle(vehicle, spot.getSpotId());
-        spotDAO.markOccupied(spot.getSpotId());
+    //     vehicleDAO.saveVehicle(vehicle, spot.getSpotId());
+    //     spotDAO.markOccupied(spot.getSpotId());
 
-        return generateTicket(vehicle, spot.getSpotId());
-    }
+    //     return generateTicket(vehicle, spot.getSpotId());
+    // }
 
 
     // AdminPanel uses this
@@ -61,7 +61,7 @@ public class ParkingService {
     }
 
     // Your EntryPanel uses this (user selects spot)
-    public model.Ticket parkVehicleAt(Vehicle vehicle, String spotId) {
+    public model.Ticket parkVehicleAt(Vehicle vehicle, String spotId, boolean isOkuCardholder) {
 
         if (vehicleDAO.isCurrentlyParked(vehicle.getPlateNumber())) {
             System.out.println("Parking Failed: Vehicle already parked.");
@@ -75,14 +75,34 @@ public class ParkingService {
 
         if (spot == null || spot.isOccupied()) return null;
 
-        if (!vehicle.canParkIn(spot.getType())) return null;
+        boolean isVip = spotDAO.isVip(vehicle.getPlateNumber());
 
-        vehicleDAO.saveVehicle(vehicle, spotId);
+        // VIP logic unchanged
+        if (spot.getType() == model.SpotType.RESERVED && !isVip) {
+            System.out.println("Parking Failed: RESERVED spot requires VIP.");
+            return null;
+        }
+
+        // ✅ HANDICAPPED spot requires OKU cardholder
+        // if (spot.getType() == model.SpotType.HANDICAPPED && !isOkuCardholder) {
+        //     System.out.println("Parking Failed: HANDICAPPED spot requires OKU cardholder.");
+        //     return null;
+        // }
+
+        // Normal suitability (VIP reserved bypass still allowed)
+        if (!(spot.getType() == model.SpotType.RESERVED && isVip)) {
+            if (!vehicle.canParkIn(spot.getType())) {
+                System.out.println("Parking Failed: Vehicle type not suitable for this spot.");
+                return null;
+            }
+        }
+
+        // ✅ Save vehicle with OKU flag
+        vehicleDAO.saveVehicle(vehicle, spotId, isOkuCardholder);
         spotDAO.markOccupied(spotId);
 
         return generateTicket(vehicle, spotId);
     }
-
 
     private model.Ticket generateTicket(Vehicle v, String spotId) {
         java.time.format.DateTimeFormatter fmt =

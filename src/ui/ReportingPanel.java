@@ -9,6 +9,7 @@ import model.FineReport.OutstandingFine;
 import model.OccupancyReport.FloorOccupancy;
 import model.OccupancyReport.TypeOccupancy;
 import service.ReportService;
+import java.time.format.DateTimeFormatter;
 
 public class ReportingPanel extends JPanel{
     private final ReportService reportService;
@@ -18,7 +19,7 @@ public class ReportingPanel extends JPanel{
         this.reportService = ReportService.getInstance();
         setLayout(new BorderLayout());
         
-        JLabel header = new JLabel("📊 Reports & Analytics", SwingConstants.CENTER);
+        JLabel header = new JLabel("Reports & Analytics", SwingConstants.CENTER);
         header.setFont(new Font("Arial", Font.BOLD, 20));
         add(header, BorderLayout.NORTH);
         
@@ -31,7 +32,7 @@ public class ReportingPanel extends JPanel{
         
         add(reportTabs, BorderLayout.CENTER);
         
-        JButton refreshBtn = new JButton("🔄 Refresh All Reports");
+        JButton refreshBtn = new JButton(" Refresh All Reports");
         refreshBtn.setFont(new Font("Arial", Font.BOLD, 14));
         refreshBtn.addActionListener(e -> refreshAllReports());
         add(refreshBtn, BorderLayout.SOUTH);
@@ -283,6 +284,9 @@ public class ReportingPanel extends JPanel{
     }
     
     private void populateVehicleTable(JTable table, VehicleListReport report) {
+
+        DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm");
+
         String[] columns = {"Plate", "Type", "Spot ID", "Spot Type", "Entry Time", "Hours", "Current Fee (RM)"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
         
@@ -292,7 +296,7 @@ public class ReportingPanel extends JPanel{
                 vehicle.getVehicleType(),
                 vehicle.getSpotId(),
                 vehicle.getSpotType(),
-                vehicle.getEntryTime().toString(),
+                vehicle.getEntryTime().format(DT_FMT),
                 vehicle.getHoursParked(),
                 String.format("%.2f", vehicle.getCurrentFee())
             });
@@ -303,31 +307,24 @@ public class ReportingPanel extends JPanel{
 
     //refresh all reports
     private void refreshAllReports() {
-        // Re-select current tab to trigger refresh
         int currentTab = reportTabs.getSelectedIndex();
+        Component selectedComp = reportTabs.getComponentAt(currentTab);
         
-        //refresh each tab (trigger)
-        Component[] components = reportTabs.getComponents();
-        for (Component comp : components) {
-            if (comp instanceof JPanel) {
-                JPanel panel = (JPanel) comp;
-                
-                for (Component child : getAllComponents(panel)) {
-                    if (child instanceof JButton) {
-                        JButton btn = (JButton) child;
-                        if (btn.getText().contains("Load") || btn.getText().contains("Generate") || btn.getText().contains("Refresh")) {
-                            btn.doClick();
-                            break;
-                        }
+        if (selectedComp instanceof JPanel) {
+            JPanel panel = (JPanel) selectedComp;
+            for (Component child : getAllComponents(panel)) {
+                if (child instanceof JButton) {
+                    JButton btn = (JButton) child;
+                    // Only click the button if it's a "Load" or "Generate" button
+                    if (btn.getText().contains("Load") || btn.getText().contains("Generate") || btn.getText().contains("Refresh")) {
+                        btn.doClick();
+                        break; 
                     }
                 }
             }
         }
         
-        JOptionPane.showMessageDialog(this, 
-            "All reports refreshed successfully!", 
-            "Refresh Complete", 
-            JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, "refresh complete!", "Success", JOptionPane.INFORMATION_MESSAGE);
     }
     
 

@@ -1,11 +1,12 @@
 package model;
 
 import java.time.LocalDateTime;
-
+import java.time.format.DateTimeFormatter;
 
 public class RevenueReport {
 
     private final LocalDateTime generatedAt;
+    private static final DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm");
 
     private final double totalParkingRevenue;
     private final double totalFineRevenue;
@@ -64,7 +65,7 @@ public class RevenueReport {
             "  - Today: RM %.2f\n" +
             "  - This Week: RM %.2f\n" +
             "  - This Month: RM %.2f",
-            generatedAt.toString(),
+            generatedAt.format(DT_FMT).toString(),
             totalRevenue, totalParkingRevenue, totalFineRevenue,
             totalTransactions, totalVehiclesServed,
             getAverageRevenuePerTransaction(),
