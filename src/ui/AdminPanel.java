@@ -4,26 +4,25 @@ import java.awt.*;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import model.ParkingSpot;
-import service.ParkingService;
-
 import model.FixedFineScheme;
 import model.HourlyFineScheme;
+import model.ParkingSpot;
 import model.ProgressiveFineScheme;
+import service.ParkingService;
 
 public class AdminPanel extends JPanel {
 
-    private JPanel mainListPanel; // Changed from 'gridPanel' to 'mainListPanel'
+    private JPanel mainListPanel; 
 
     public AdminPanel() {
         setLayout(new BorderLayout());
 
-        // 1. Header
+        // 1. header
         JLabel header = new JLabel("Parking Lot Status", SwingConstants.CENTER);
         header.setFont(new Font("Arial", Font.BOLD, 18));
         add(header, BorderLayout.NORTH);
 
-        // ===== Fine Scheme Selector (Admin Only) =====
+        // fine scheme selector (admin only)
         JPanel schemePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         schemePanel.add(new JLabel("Fine Scheme:"));
@@ -58,21 +57,21 @@ public class AdminPanel extends JPanel {
         add(schemePanel, BorderLayout.BEFORE_FIRST_LINE);
 
 
-        // 2. The Main Container (Holds the 5 Floor Panels vertically)
+        // 2. main container (5 floor panels vertically)
         mainListPanel = new JPanel();
         mainListPanel.setLayout(new BoxLayout(mainListPanel, BoxLayout.Y_AXIS));
         
-        // Add scrolling because 5 floors might not fit on one screen
+        // add scrolling because 5 floors not fit on one screen
         JScrollPane scrollPane = new JScrollPane(mainListPanel);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Faster scrolling
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // faster scrolling
         add(scrollPane, BorderLayout.CENTER);
 
-        // 3. Refresh Button
+        // 3. refresh Button
         JButton refreshBtn = new JButton("Refresh Status");
         refreshBtn.addActionListener(e -> loadParkingStatus());
         add(refreshBtn, BorderLayout.SOUTH);
 
-        // Load data immediately
+        // load data immediately
         loadParkingStatus();
     }
 
@@ -81,21 +80,21 @@ public class AdminPanel extends JPanel {
 
         List<ParkingSpot> allSpots = ParkingService.getInstance().getParkingLotStatus();
 
-        // Loop through floors 5 down to 1 (To match the visual of Top Floor on Top)
+        // loop through floors 5 down to 1 (to match the visual of top floor on top)
         for (int floor = 5; floor >= 1; floor--) {
             
-            // A. Create a Panel for THIS Floor
+            // A. create a panel for THIS Floor
             JPanel floorPanel = new JPanel();
             // 2 rows, 10 columns (fits 20 spots nicely)
             floorPanel.setLayout(new GridLayout(0, 6, 10, 10));   
 
-            // Add a Border with Title (e.g., "Floor 5")
+            // border with title ("Floor 5")
             TitledBorder border = BorderFactory.createTitledBorder("Floor " + floor);
             border.setTitleFont(new Font("Arial", Font.BOLD, 14));
             floorPanel.setBorder(border);
 
-            // B. Filter spots just for this floor
-            String floorPrefix = "F" + floor + "-"; // e.g., "F1-"
+            // B. filter spots just for this floor
+            String floorPrefix = "F" + floor + "-"; // "F1-"
             
             for (ParkingSpot spot : allSpots) {
                 if (spot.getSpotId().startsWith(floorPrefix)) {
@@ -104,10 +103,10 @@ public class AdminPanel extends JPanel {
                 }
             }
 
-            // C. Add this floor to the main list
+            // C. add this floor to the main list
             mainListPanel.add(floorPanel);
             
-            // D. Add a spacer/separator between floors
+            // D. add a spacer/separator between floors
             mainListPanel.add(Box.createVerticalStrut(20));
         }
 
@@ -115,7 +114,6 @@ public class AdminPanel extends JPanel {
         mainListPanel.repaint();
     }
 
-    // Helper method to create the button design
     private JButton createSpotButton(ParkingSpot spot) {
         JButton spotBtn = new JButton();
         spotBtn.setPreferredSize(new Dimension(100, 85)); // Slightly taller for extra text
@@ -123,35 +121,35 @@ public class AdminPanel extends JPanel {
         spotBtn.setBorderPainted(true);
         spotBtn.setFont(new Font("Arial", Font.PLAIN, 10));
 
-        // 1. Format the Price
-        // "RM 2.00/hr"
+        // 1. format the Price
+        // RM 2.00/hr
         String priceText = String.format("RM %.2f/hr", spot.getType().getRate());
 
-        // 2. Build the HTML Text
+        // 2. HTML Text
         String statusText = spot.isOccupied() ? "Occupied" : "Available";
         String plateText = spot.isOccupied() ? "<br><b style='color:yellow'>" + spot.getVehiclePlate() + "</b>" : "";
         
         spotBtn.setText("<html><center>" + 
             "<b>" + spot.getSpotId() + "</b><br>" + 
             spot.getType() + "<br>" + 
-            "<b>" + priceText + "</b><br>" + // <--- Added Price Here
+            "<b>" + priceText + "</b><br>" + 
             statusText + 
             plateText + 
             "</center></html>");
 
-        // 3. Color Logic (Same as before)
+        // 3. color logic
         if (spot.isOccupied()) {
-            spotBtn.setBackground(new Color(255, 102, 102)); // Red
+            spotBtn.setBackground(new Color(255, 102, 102)); // red
         } else {
             switch (spot.getType()) {
                 case COMPACT:
-                    spotBtn.setBackground(new Color(144, 238, 144)); // Green
+                    spotBtn.setBackground(new Color(144, 238, 144)); // green
                     break;
                 case RESERVED:
-                    spotBtn.setBackground(new Color(173, 216, 230)); // Blue
+                    spotBtn.setBackground(new Color(173, 216, 230)); // blue
                     break;
                 case HANDICAPPED:
-                    spotBtn.setBackground(new Color(255, 255, 153)); // Yellow (distinct for Handicapped)
+                    spotBtn.setBackground(new Color(255, 255, 153)); // yellow (distinct for Handicapped)
                     break;
                 default: 
                     spotBtn.setBackground(Color.WHITE);

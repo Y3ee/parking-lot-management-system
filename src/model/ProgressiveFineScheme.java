@@ -8,7 +8,7 @@ public class ProgressiveFineScheme implements FineScheme {
         double fine = 50.0;
         if (totalHoursParked > 48) fine += 100.0;
         if (totalHoursParked > 72) fine += 150.0;
-        if (totalHoursParked > 72) fine += 200.0; // "Above 72"
+        if (totalHoursParked > 72) fine += 200.0; // above 72
         return fine;
     }
 

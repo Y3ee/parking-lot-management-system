@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public abstract class Vehicle {
     protected String plateNumber;
-    protected String vehicleType;       // e.g. Car, Motorcycle, SUV_TRUCK, HANDICAPPED
+    protected String vehicleType;       
     protected LocalDateTime entryTime;
     protected LocalDateTime exitTime;   // null if parked
 

@@ -3,12 +3,8 @@ package ui;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
 import model.ParkingSpot;
 import model.SpotType;
 import model.Vehicle;
@@ -25,7 +21,7 @@ public class EntryPanel extends JPanel {
     public EntryPanel() {
         setLayout(new BorderLayout());
 
-        // --- TOP PANEL: Inputs ---
+        // top panel: inputs
         JPanel topPanel = new JPanel(new FlowLayout());
         topPanel.setBorder(new TitledBorder("Step 1: Enter Details & Select Type"));
 
@@ -33,16 +29,7 @@ public class EntryPanel extends JPanel {
         plateField = new JTextField(10);
         topPanel.add(plateField);
 
-        // ✅ Refresh grid when plate changes (so reserved unlocks for VIP)
-        plateField.getDocument().addDocumentListener(new DocumentListener() {
-            public void changedUpdate(DocumentEvent e) { checkAndRefresh(); }
-            public void removeUpdate(DocumentEvent e) { checkAndRefresh(); }
-            public void insertUpdate(DocumentEvent e) { checkAndRefresh(); }
-
-            private void checkAndRefresh() {
-                SwingUtilities.invokeLater(() -> refreshGrid());
-            }
-        });
+        plateField.addActionListener(e -> refreshGrid());
 
         topPanel.add(new JLabel("Vehicle Type:"));
 
@@ -50,6 +37,7 @@ public class EntryPanel extends JPanel {
         typeCombo = new JComboBox<>(types);
         topPanel.add(typeCombo);
 
+        // refresh when vehicle type change
         typeCombo.addActionListener(e -> refreshGrid());
 
         JLabel helpLabel = new JLabel("(Step 2: Click a suitable spot below to park)");
@@ -63,7 +51,7 @@ public class EntryPanel extends JPanel {
 
         add(topPanel, BorderLayout.NORTH);
 
-        // --- CENTER PANEL: The Interactive Grid ---
+        // center panel: the interactive grid 
         mainGridPanel = new JPanel();
         mainGridPanel.setLayout(new BoxLayout(mainGridPanel, BoxLayout.Y_AXIS));
 
@@ -104,7 +92,7 @@ public class EntryPanel extends JPanel {
         mainGridPanel.repaint();
     }
 
-    // ✅ Polymorphism: build correct Vehicle subclass
+    // Polymorphism: build correct Vehicle subclass
     private Vehicle buildVehicleFromUI(String plate) {
         String selectedType = (String) typeCombo.getSelectedItem();
 
@@ -139,11 +127,11 @@ public class EntryPanel extends JPanel {
         Vehicle preview = buildVehicleFromUI("TEMP");
         boolean isVip = !currentPlate.isEmpty() && new dao.ParkingSpotDAO().isVip(currentPlate);
 
-        // ✅ VIP Logic for RESERVED (Modified to bypass suitability check for VIP)
+        // VIP Logic for RESERVED
         if (spot.getType() == SpotType.RESERVED) {
             if (isVip) {
-                btn.setEnabled(true); // ✅ Always enabled for VIP regardless of vehicle type
-                btn.setBackground(new Color(173, 216, 230)); // Blue
+                btn.setEnabled(true); // always enabled for VIP regardless of vehicle type
+                btn.setBackground(new Color(173, 216, 230)); // blue
                 btn.setText("<html><center><b>" + spot.getSpotId()
                         + "</b><br>RESERVED<br><b>VIP ACCESS</b></center></html>");
             } else {
@@ -154,7 +142,7 @@ public class EntryPanel extends JPanel {
             }
 
         } else {
-            // Standard suitability check for non-reserved spots
+            // standard suitability check for non-reserved spots
             boolean suitable = preview.canParkIn(spot.getType());
             if (!suitable) {
                 btn.setEnabled(false);
@@ -195,10 +183,9 @@ public class EntryPanel extends JPanel {
             return;
         }
 
-        // ✅ Build vehicle
         Vehicle v = buildVehicleFromUI(plate);
 
-        // ✅ NEW: If user selected Handicapped type, ask card for ANY spot
+        // if user selected Handicapped type, ask card for ANY spot
         boolean isOkuCardholder = false;
         String selectedType = ((String) typeCombo.getSelectedItem());
 
@@ -224,7 +211,7 @@ public class EntryPanel extends JPanel {
             }
         }
 
-        // ✅ Pass the popup result into ParkingService so it saves is_oku_cardholder
+        // pass the popup result into ParkingService so it saves is_oku_cardholder
         model.Ticket ticket = ParkingService.getInstance()
                 .parkVehicleAt(v, spot.getSpotId(), isOkuCardholder);
 
@@ -264,9 +251,9 @@ public class EntryPanel extends JPanel {
                 boolean saved = new dao.ParkingSpotDAO().registerVip(plate, name);
                 if (saved) {
                     JOptionPane.showMessageDialog(this, "Success! " + plate + " is now a VIP.");
-                    // ✅ Put plate back into main field (nice UX)
+                    // put plate back into main field 
                     plateField.setText(plate);
-                    refreshGrid(); // ✅ unlock reserved instantly
+                    refreshGrid(); //unlock reserved instantly
                 } else {
                     JOptionPane.showMessageDialog(this, "Error: Plate already registered!",
                             "Error", JOptionPane.ERROR_MESSAGE);

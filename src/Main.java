@@ -1,5 +1,5 @@
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 import service.ParkingService;
 import ui.AdminPanel;
 import ui.EntryPanel;
@@ -8,7 +8,7 @@ import ui.ReportingPanel;
 
 public class Main {
     public static void main(String[] args) {
-        // Initialize the Singleton ParkingService to ensure database is ready
+        // initialize the Singleton ParkingService to ensure database is ready
         ParkingService.getInstance(); 
 
         SwingUtilities.invokeLater(() -> {
@@ -16,24 +16,22 @@ public class Main {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(1100, 900); 
 
-            // Main Tabbed Pane structure
+            // main tabbed pane structure
             JTabbedPane tabs = new JTabbedPane();
             
-            // 1. Customer-Facing Tabs (Always Visible)
+            // 1. customer-facing tabs
             tabs.addTab("Entry / Park", new EntryPanel());
             tabs.addTab("Exit / Payment", new ExitPanel());
 
-            // 2. Admin-Only Login Button
+            // 2. admin-only login button
             JButton adminLoginBtn = new JButton("🔒 Admin Access");
             adminLoginBtn.setFocusPainted(false);
             adminLoginBtn.setBackground(new Color(240, 240, 240));
 
             adminLoginBtn.addActionListener(e -> {
-                // Use JPasswordField to hide the characters as the admin types
                 JPasswordField pwdField = new JPasswordField();
                 Object[] message = {"Enter Admin Password:", pwdField};
                 
-                // ✅ FIXED: Changed PROTECTED_MESSAGE to QUESTION_MESSAGE
                 int action = JOptionPane.showConfirmDialog(
                         frame, 
                         message, 
@@ -45,16 +43,16 @@ public class Main {
                 if (action == JOptionPane.OK_OPTION) {
                     String password = new String(pwdField.getPassword());
                     
-                    // Simple authentication check
+                    // simple authentication check
                     if ("admin123".equals(password)) {
-                        // Dynamically add the restricted panels
+                        // dynamically add the restricted panels
                         tabs.addTab("Admin / View Status", new AdminPanel());
                         tabs.addTab("Reports", new ReportingPanel());
                         
-                        // Switch to the Admin tab automatically
+                        // switch to the Admin tab automatically
                         tabs.setSelectedIndex(2);
                         
-                        // Hide the login button once authenticated
+                        // hide the login button once authenticated
                         adminLoginBtn.setVisible(false);
                         JOptionPane.showMessageDialog(frame, "Access Granted", "Success", JOptionPane.INFORMATION_MESSAGE);
                     } else {
@@ -63,7 +61,7 @@ public class Main {
                 }
             });
 
-            // Layout Management
+            // layout management
             JPanel topBar = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             topBar.add(adminLoginBtn);
 

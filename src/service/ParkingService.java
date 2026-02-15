@@ -28,39 +28,12 @@ public class ParkingService {
         return instance;
     }
 
-    // ✅ FIX: remove getType() usage. Use polymorphism vehicle.canParkIn(spot.getType())
-    // Option 1: change return type to Ticket (recommended)
-    // public model.Ticket parkVehicle(Vehicle vehicle) {
-
-    //     if (vehicleDAO.isCurrentlyParked(vehicle.getPlateNumber())) {
-    //         System.out.println("Parking Failed: Vehicle already parked.");
-    //         return null;
-    //     }
-
-    //     ParkingSpot spot = spotDAO.getAllSpots().stream()
-    //             .filter(s -> !s.isOccupied())
-    //             .filter(s -> vehicle.canParkIn(s.getType()))
-    //             .findFirst()
-    //             .orElse(null);
-
-    //     if (spot == null) {
-    //         System.out.println("Parking Failed: No suitable spots available.");
-    //         return null;
-    //     }
-
-    //     vehicleDAO.saveVehicle(vehicle, spot.getSpotId());
-    //     spotDAO.markOccupied(spot.getSpotId());
-
-    //     return generateTicket(vehicle, spot.getSpotId());
-    // }
-
-
     // AdminPanel uses this
     public List<ParkingSpot> getParkingLotStatus() {
         return spotDAO.getAllSpots();
     }
 
-    // Your EntryPanel uses this (user selects spot)
+    // EntryPanel uses this 
     public model.Ticket parkVehicleAt(Vehicle vehicle, String spotId, boolean isOkuCardholder) {
 
         if (vehicleDAO.isCurrentlyParked(vehicle.getPlateNumber())) {
@@ -83,13 +56,7 @@ public class ParkingService {
             return null;
         }
 
-        // ✅ HANDICAPPED spot requires OKU cardholder
-        // if (spot.getType() == model.SpotType.HANDICAPPED && !isOkuCardholder) {
-        //     System.out.println("Parking Failed: HANDICAPPED spot requires OKU cardholder.");
-        //     return null;
-        // }
-
-        // Normal suitability (VIP reserved bypass still allowed)
+        // normal suitability (VIP reserved bypass still allowed)
         if (!(spot.getType() == model.SpotType.RESERVED && isVip)) {
             if (!vehicle.canParkIn(spot.getType())) {
                 System.out.println("Parking Failed: Vehicle type not suitable for this spot.");
@@ -97,7 +64,7 @@ public class ParkingService {
             }
         }
 
-        // ✅ Save vehicle with OKU flag
+        // save vehicle with OKU flag
         vehicleDAO.saveVehicle(vehicle, spotId, isOkuCardholder);
         spotDAO.markOccupied(spotId);
 

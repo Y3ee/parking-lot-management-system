@@ -1,14 +1,13 @@
 package dao;
 
 import database.DatabaseConnection;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class FineDAO {
 
-    // Sum all UNPAID fines
+    // sum all unpaid fines
     public double getUnpaidTotal(String plate) {
         String sql = "SELECT COALESCE(SUM(amount),0) AS total FROM fine WHERE plate_number=? AND status='UNPAID'";
 
@@ -25,7 +24,7 @@ public class FineDAO {
         }
     }
 
-    // Insert NEW fine (always UNPAID)
+    // insert NEW fine (always UNPAID)
     public void addFine(String plate, double amount) {
         if (amount <= 0) return;
 
@@ -43,7 +42,7 @@ public class FineDAO {
         }
     }
 
-    // Mark ALL unpaid fines as PAID
+    // mark ALL unpaid fines as PAID
     public void markAllPaid(String plate) {
         String sql = "UPDATE fine SET status='PAID' WHERE plate_number=? AND status='UNPAID'";
 

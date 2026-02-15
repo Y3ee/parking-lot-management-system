@@ -3,11 +3,10 @@ package model;
 public class ParkingSpot {
 
     private String spotId;
-    private SpotType type;      // Use Enum, not String
+    private SpotType type;      
     private boolean occupied;
-    private String vehiclePlate; // <--- ADD THIS (Required by )
+    private String vehiclePlate; 
 
-    // Notice we DON'T pass hourlyRate anymore. The Enum handles it.
     public ParkingSpot(String spotId, SpotType type) {
         this.spotId = spotId;
         this.type = type;
@@ -16,10 +15,10 @@ public class ParkingSpot {
     }
 
     public double getHourlyRate() {
-        return type.getRate(); // <--- This fulfills "Future Proofing"
+        return type.getRate(); // future proofing
     }
 
-    public void occupy(String plate) { // <--- Update this to take the plate
+    public void occupy(String plate) { // take the plate
         this.occupied = true;
         this.vehiclePlate = plate;
     }

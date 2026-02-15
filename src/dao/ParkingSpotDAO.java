@@ -13,7 +13,7 @@ import model.SpotType;
 
 public class ParkingSpotDAO {
 
-    // Method 1: Find Available Spot
+    // 1. find available spot
     public ParkingSpot findAvailableSpot(SpotType type) {
         String sql = "SELECT * FROM parking_spot WHERE type = ? AND status = 'AVAILABLE' LIMIT 1";
         
@@ -35,7 +35,7 @@ public class ParkingSpotDAO {
         return null; 
     }
 
-    // Method 2: Mark Occupied
+    // 2. mark as occupied
     public void markOccupied(String spotId) {
         String sql = "UPDATE parking_spot SET status = 'OCCUPIED' WHERE spot_id = ?";
         Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -47,7 +47,7 @@ public class ParkingSpotDAO {
         }
     }
 
-    // Method 3: Get ALL spots + Current Vehicle (For Admin Panel)
+    // 3. get ALL spots + current vehicle (for admin panel)
     public List<ParkingSpot> getAllSpots() {
         List<ParkingSpot> spots = new ArrayList<>();
         String sql = "SELECT p.*, v.plate_number FROM parking_spot p LEFT JOIN vehicle v ON p.spot_id = v.spot_id AND v.exit_time IS NULL";
@@ -92,22 +92,21 @@ public class ParkingSpotDAO {
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             conn.setAutoCommit(false); 
 
-            // 5 FLOORS
+            // 5 floors
             for (int floor = 1; floor <= 5; floor++) {
                 
-                // 18 SPOTS per Floor
+                // 18 spots per Floor
                 for (int s = 1; s <= 18; s++) {
 
                     int row = 1;
                     if (s > 6) row = 2;
                     if (s > 12) row = 3;
                     
-                    // ID Format: F1-R1-S1
+                    // ID format: F1-R1-S1
                     String spotId = "F" + floor + "-R" + row + "-S" + s;
                     
                     SpotType type = SpotType.REGULAR; // Default (RM 5.0)
                     
-                    // --- YOUR SPECIFIC RULES ---
                     if (s >= 1 && s <= 2) {
                         type = SpotType.HANDICAPPED; // S1-S2
                     } 
@@ -140,7 +139,7 @@ public class ParkingSpotDAO {
         }
     }
 
-    // Helper method to count spots
+    // count spots
     private int getSpotCount() {
         String sql = "SELECT COUNT(*) FROM parking_spot";
         Connection conn = DatabaseConnection.getInstance().getConnection();
@@ -155,7 +154,7 @@ public class ParkingSpotDAO {
         return 0;
     }
 
-    // Create the VIP table if it doesn't exist
+    // create the VIP table if it doesn't exist
     public void createVipTable() {
         String sql = "CREATE TABLE IF NOT EXISTS vip_whitelist (" +
                      "plate_number TEXT PRIMARY KEY, " +
@@ -169,7 +168,7 @@ public class ParkingSpotDAO {
         }
     }
 
-    // Method to REGISTER a new VIP
+    // regisyer a new VIP
     public boolean registerVip(String plate, String name) {
         String sql = "INSERT INTO vip_whitelist(plate_number, owner_name) VALUES(?, ?)";
         
@@ -185,7 +184,7 @@ public class ParkingSpotDAO {
         }
     }
 
-    // Method to CHECK if a plate is VIP
+    // check if a plate is VIP
     public boolean isVip(String plate) {
         String sql = "SELECT * FROM vip_whitelist WHERE plate_number = ?";
         

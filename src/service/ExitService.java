@@ -3,13 +3,12 @@ package service;
 import dao.ParkingSpotDAO;
 import dao.PaymentDAO;
 import dao.VehicleDAO;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import model.ActiveParkingRecord;
 import model.ExitBill;
 import model.Receipt;
 import model.SpotType;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 public class ExitService {
 
@@ -32,7 +31,7 @@ public class ExitService {
         return instance;
     }
 
-    // 1) Preview bill (NO DB updates)
+    // 1. preview bill (NO DB updates)
     public ExitBill previewBill(String plate) {
         String p = normalizePlate(plate);
 
@@ -52,7 +51,7 @@ public class ExitService {
         if (isHandicappedVehicle) {
             if (spotType == SpotType.HANDICAPPED) {
                 if (hasCard) {
-                    hourlyRate = 0.0;          // FREE
+                    hourlyRate = 0.0;          // free
                     parkingFee = 0.0;
                 } else {
                     hourlyRate = 2.0;          // no card but handicapped vehicle in handicapped spot -> RM2/hr
@@ -95,11 +94,11 @@ public class ExitService {
         );
     }
 
-    // 2) Pay ONLY parking fee (fines stay unpaid and carry forward)
+    // 2. pay ONLY parking fee (fines stay unpaid and carry forward)
     public Receipt payParkingOnlyAndExit(String plate, String paymentMethod) {
         ExitBill bill = previewBill(plate);
 
-        // ✅ only insert fines now (NOT during preview)
+        // only insert fines now (NOT during preview)
         if (bill.getNewFines() > 0) {
             fineService.addFine(bill.getPlate(), bill.getNewFines()); // unpaid
         }
@@ -122,11 +121,11 @@ public class ExitService {
         return receipt;
     }
 
-    // 3) Pay ALL (parking + previous unpaid fines + new fines)
+    // 3. pay ALL (parking + previous unpaid fines + new fines)
     public Receipt payAllAndExit(String plate, String paymentMethod) {
         ExitBill bill = previewBill(plate);
 
-        // ✅ insert new fine record then mark all fines paid
+        // insert new fine record then mark all fines paid
         if (bill.getNewFines() > 0) {
             fineService.addFine(bill.getPlate(), bill.getNewFines());
         }
@@ -142,14 +141,13 @@ public class ExitService {
 
         Receipt receipt = new Receipt(bill, safeMethod(paymentMethod), bill.getTotalDue(), 0.0);
 
-        // ✅ store receipt/payment in DB
+        // store receipt/payment in DB
         paymentDAO.saveReceipt(receipt);
 
         return receipt;
     }
 
-    // ---------------- helpers ----------------
-
+    // helper methods 
     private String normalizePlate(String plate) {
         String p = plate == null ? "" : plate.trim();
         if (p.isEmpty()) throw new IllegalArgumentException("Plate number cannot be empty.");

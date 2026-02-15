@@ -12,11 +12,11 @@ public class DatabaseConnection {
 
     private DatabaseConnection() {
         try {
-            // 1. Get the dynamic path to the project root
+            // 1. get the dynamic path to the project root
             String projectRoot = System.getProperty("user.dir");
             
-            // 2. Build the full path to parking.db
-            // This works on Windows (\) and Mac (/) automatically
+            // 2. build the full path to parking.db
+            // Windows (\) and Mac (/) automatically
             String dbPath = projectRoot + File.separator + "parking.db";
             
             String url = "jdbc:sqlite:" + dbPath;
@@ -25,7 +25,7 @@ public class DatabaseConnection {
             connection = DriverManager.getConnection(url);
             connection.setAutoCommit(true);
             
-            // 3. Print the path so you can debug!
+            // 3. print the path (for debugging)
             System.out.println("Database connected at: " + dbPath);
             
             createTables();

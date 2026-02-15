@@ -1,12 +1,11 @@
 package ui;
 
+import java.awt.*;
+import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import model.ExitBill;
 import model.Receipt;
 import service.ParkingService;
-
-import javax.swing.*;
-import javax.swing.border.TitledBorder;
-import java.awt.*;
 
 public class ExitPanel extends JPanel {
 
@@ -39,7 +38,7 @@ public class ExitPanel extends JPanel {
 
         add(top, BorderLayout.NORTH);
 
-        // CENTER: output area
+        // center: output area
         output = new JTextArea(18, 55);
         output.setEditable(false);
         output.setFont(new Font("Monospaced", Font.PLAIN, 12));

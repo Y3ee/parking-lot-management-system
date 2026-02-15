@@ -10,12 +10,12 @@ public class FineService {
 
     private static FineService instance;
 
-    private FineScheme scheme; // Strategy
+    private FineScheme scheme; 
     private final FineDAO fineDAO;
     private final ParkingSpotDAO spotDAO;
 
     private FineService() {
-        this.scheme = new FixedFineScheme(); // DEFAULT scheme
+        this.scheme = new FixedFineScheme(); // default scheme
         this.fineDAO = new FineDAO();
         this.spotDAO = new ParkingSpotDAO();
     }
@@ -40,7 +40,7 @@ public class FineService {
     }
 
     public double calculateReservedMisuseFine(String plate, SpotType spotType) {
-        // Reserved without reservation system: use VIP whitelist rule
+        // reserved without reservation system: use VIP whitelist rule
         if (spotType == SpotType.RESERVED && !spotDAO.isVip(norm(plate))) {
             return 50.0;
         }
