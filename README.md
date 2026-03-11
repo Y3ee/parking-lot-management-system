@@ -6,8 +6,6 @@
 This application simulates a real-world, multi-floor parking facility with features like various types of vehicle entries and exits, VIP whitelisting, dynamic fee and fine calculations, and real-time visual monitoring.
 
 ## ✨ Key Features
-
-### 🅿️ Core Parking System
 * **Visual Interactive Grid:** Real-time visual representation of a 5-floor parking lot (18 spots per floor).
 * **Smart Spot Allocation:** Validates vehicle types (Car, Motorcycle, SUV/Truck, Handicapped) against spot types (Regular, Compact, Handicapped, Reserved) using Polymorphism.
 * **Automated Ticketing & Billing:** Generates unique ticket IDs on entry and calculates precise, time-based receipts on exit.
