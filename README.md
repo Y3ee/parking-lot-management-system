@@ -12,7 +12,6 @@ This application simulates a real-world, multi-floor parking facility with featu
 * **Smart Spot Allocation:** Validates vehicle types (Car, Motorcycle, SUV/Truck, Handicapped) against spot types (Regular, Compact, Handicapped, Reserved) using Polymorphism.
 * **Automated Ticketing & Billing:** Generates unique ticket IDs on entry and calculates precise, time-based receipts on exit.
 * **VIP Spot:** Real-time license plate detection. Auto-upgrades registered VIPs to 'Reserved' status and grants exclusive access to blue zones.
-* **Advance Reservations:** Users can book specific spots in advance. The system secures the spot (turns orange) and strictly denies access to unauthorized vehicles.
 * **Dynamic Fine Engine:** Implements the **Strategy Design Pattern** to allow Admins to switch between fine calculation rules on the fly:
   * *Fixed Scheme:* Flat rate for overstaying (>24 hours).
   * *Progressive Scheme:* Tiered penalties that increase over time.
